@@ -212,8 +212,11 @@ function findNamedEntityTreeBranch(nodeIx, cp) {
 
 //Tokenizer
 class Tokenizer {
-    constructor() {
+    constructor(options) {
         this.preprocessor = new Preprocessor();
+
+        this.options = Object.create(null);
+        this.options.decodeEntities = options && typeof options.decodeEntities !== 'undefined' ? options.decodeEntities : true;
 
         this.tokenQueue = [];
 
@@ -589,7 +592,7 @@ class Tokenizer {
 
         if (cp === $.LESS_THAN_SIGN) {
             this.state = TAG_OPEN_STATE;
-        } else if (cp === $.AMPERSAND) {
+        } else if (cp === $.AMPERSAND && this.options.decodeEntities) {
             this.returnState = DATA_STATE;
             this.state = CHARACTER_REFERENCE_STATE;
         } else if (cp === $.NULL) {
@@ -607,7 +610,7 @@ class Tokenizer {
     [RCDATA_STATE](cp) {
         this.preprocessor.dropParsedChunk();
 
-        if (cp === $.AMPERSAND) {
+        if (cp === $.AMPERSAND && this.options.decodeEntities) {
             this.returnState = RCDATA_STATE;
             this.state = CHARACTER_REFERENCE_STATE;
         } else if (cp === $.LESS_THAN_SIGN) {
@@ -1264,7 +1267,7 @@ class Tokenizer {
     [ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE](cp) {
         if (cp === $.QUOTATION_MARK) {
             this.state = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
-        } else if (cp === $.AMPERSAND) {
+        } else if (cp === $.AMPERSAND && this.options.decodeEntities) {
             this.returnState = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
             this.state = CHARACTER_REFERENCE_STATE;
         } else if (cp === $.NULL) {
@@ -1283,7 +1286,7 @@ class Tokenizer {
     [ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE](cp) {
         if (cp === $.APOSTROPHE) {
             this.state = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
-        } else if (cp === $.AMPERSAND) {
+        } else if (cp === $.AMPERSAND && this.options.decodeEntities) {
             this.returnState = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
             this.state = CHARACTER_REFERENCE_STATE;
         } else if (cp === $.NULL) {
@@ -1302,7 +1305,7 @@ class Tokenizer {
     [ATTRIBUTE_VALUE_UNQUOTED_STATE](cp) {
         if (isWhitespace(cp)) {
             this._leaveAttrValue(BEFORE_ATTRIBUTE_NAME_STATE);
-        } else if (cp === $.AMPERSAND) {
+        } else if (cp === $.AMPERSAND && this.options.decodeEntities) {
             this.returnState = ATTRIBUTE_VALUE_UNQUOTED_STATE;
             this.state = CHARACTER_REFERENCE_STATE;
         } else if (cp === $.GREATER_THAN_SIGN) {
