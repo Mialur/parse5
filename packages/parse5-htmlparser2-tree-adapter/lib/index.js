@@ -42,6 +42,19 @@ class Node {
 
     get nodeType() {
         return nodeTypes[this.type] || nodeTypes.element;
+    },
+
+    toJSON() {
+        return {
+            type: this.type,
+            name: this.name,
+            namespace: this.namespace,
+            attribs: this.attribs,
+            'x-attribsNamespace': this['x-attribsNamespace'],
+            'x-attribsPrefix':  this['x-attribsPrefix'],
+            data: this.data,
+            children: this.children
+        };
     }
 }
 
